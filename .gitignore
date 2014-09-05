@@ -1,5 +1,8 @@
 node_modules
 build
 *.log
+
+# Runtime data
+pids
 *.DS_Store
 
