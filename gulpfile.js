@@ -84,5 +84,5 @@ gulp.task('browser-sync', function() {
 
 
 gulp.task('watch', function() {
-    gulp.watch('public/**/*', ['build']);
+    gulp.watch('public/**/*', ['build', 'browserify']);
 });

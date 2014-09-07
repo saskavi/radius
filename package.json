@@ -10,6 +10,7 @@
     "client-firebase": "^1.0.1",
     "firebase": "^1.0.21",
     "geofire": "^3.0.2",
+    "jquery": "^2.1.1",
     "lodash": "~2.4.1",
     "uuid": "^1.4.1"
   },

@@ -1,34 +1,44 @@
 var uuid = require('uuid');
+var $ = require('jquery');
 
 var firebase = new Firebase('https://radius.firebaseio.com');
-
 var geoFire = new GeoFire(firebase.child('locations'));
 
 var userID = getUserID();
+var userPosition = null;
+var peersQuery = null;
+var radius = 1;
 
-var chatDiv = document.getElementById("chat");
+//start here
+$(function() {
 
-var messageDiv = document.getElementById("message_text");
+  $("#send_button").click(function() {
+    console.log("btn clicked");
+    sendMessage($("#message_text").val());
+    $("#message_text").val("")
+  });
+
+  $("#distance_slider").change(function() {
+    console.log("distance changed", $("#distance_slider").val());
+    ds = $(this);
+    radius = parseFloat(ds.val(), 2) / 200.0 * 9.0;
+    radius = (radius * radius * radius * radius).toFixed(2);
+    $("#distance_label").text(radius);
+    updatePeersQuery();
+  });
+
+  //start by getting GPS position
+  navigator.geolocation.getCurrentPosition(function(position) {
+    userPosition = [position.coords.latitude, position.coords.longitude];
+    geoFire.set(userID, userPosition).then(updatePeersQuery);
+  });
+
+});
 
 
-
-function getUserID() {
-  var userID = localStorage.getItem('userID');
-  if (!userID) {
-    userID = uuid.v4();
-    localStorage.setItem('userID', userID);
-  }
-  return userID;
-}
-
-
-function sendMessage() {
-  //publish message in our message stream
-  var msg = messageDiv.value;
+function sendMessage(msg) {
   firebase.child('users').child(userID).push(msg);
-  messageDiv.value = ""
 }
-window.sendMessage = sendMessage;
 
 
 function subscribeToPeer(peerID) {
@@ -37,11 +47,7 @@ function subscribeToPeer(peerID) {
   peer.limit(10).on("child_added", function(snapshot) {
     var text = peerID + ": " + snapshot.val();
     console.log('new message', text);
-    var para = document.createElement('p');
-    var node = document.createTextNode(text);
-    para.appendChild(node);
-    chatDiv.appendChild(para);
-
+    $("#chat").append($('<p>' + text + '</p>'));
   });
 }
 
@@ -52,40 +58,41 @@ function unsubscribeFromPeer(peerID) {
 }
 
 
-function onPosition(position) {
-  var lat = position.coords.latitude;
-  var lon = position.coords.longitude;
-  geoFire.set(userID, [lat, lon]).then(function() {
+function updatePeersQuery() {
+  if (peersQuery) peersQuery.cancel();
 
-      var geoPeersQuery = geoFire.query({
-        center: [lat, lon],
-        radius: 10000
-      });
+  if (!userPosition) return;
 
-      geoPeersQuery.on("ready", function() {
-        console.log("GeoQuery has loaded and fired all other events for initial data");
-      });
+  peersQuery = geoFire.query({
+    center: userPosition,
+    radius: parseFloat(radius)
+  });
 
-      geoPeersQuery.on("key_entered", function(key, location, distance) {
-        console.log(key + "Key entered query at " + location + " (" + distance + " km from user)");
-        subscribeToPeer(key);
-      });
+  peersQuery.on("ready", function() {
+    console.log("GeoQuery has loaded and fired all other events for initial data");
+  });
 
-      geoPeersQuery.on("key_exited", function(key, location, distance) {
-        console.log(key + "Key exited query to " + location + " (" + distance + " km from user)");
-        unsubscribeFromPeer(key);
-      });
+  peersQuery.on("key_entered", function(key, location, radius) {
+    subscribeToPeer(key);
+    console.log(key + "user entered " + distance + " km from here(" + key + ")");
+  });
 
-      geoPeersQuery.on("key_moved", function(key, location, distance) {
-        console.log(key + "Key moved within query to " + location + " (" + distance + " km from user)");
-      });
-    },
-    function(err) {
-      console.log("Error:", err);
-      alert(err);
-    });
+  peersQuery.on("key_exited", function(key, location, radius) {
+    unsubscribeFromPeer(key);
+    console.log(key + "user exited " + distance + " km from here(" + key + ")");
+  });
+
+  peersQuery.on("key_moved", function(key, location, radius) {
+    console.log(key + "user moved " + distance + " km from here(" + key + ")");
+  });
 }
 
 
-//start by getting GPS position
-navigator.geolocation.getCurrentPosition(onPosition);
+function getUserID() {
+  var userID = localStorage.getItem('userID');
+  if (!userID) {
+    userID = uuid.v4();
+    localStorage.setItem('userID', userID);
+  }
+  return userID;
+}

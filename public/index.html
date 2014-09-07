@@ -10,11 +10,13 @@
 
         <h1>radius</h1>
         <p>talk to everyone within how many km?<p>
-        <input type=range min=1 max=100 step=1 value=20>
 
+        <input id="distance_slider" type=range min=1 max=200 step=1 value=20>
+            <span id="distance_label">20</span>km
+        </input>
         <div id="chat"></div>
         <input id="message_text"type="text"></input>
-        <button id="send_button" onClick="sendMessage()">send</button>
+        <button id="send_button">send</button>
 
         <script src="http://rsvpjs-builds.s3.amazonaws.com/rsvp-latest.js"></script>
         <script src="https://cdn.firebase.com/js/client/1.0.21/firebase.js"></script>
