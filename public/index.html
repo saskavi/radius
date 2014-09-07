@@ -7,7 +7,7 @@
         <link rel="stylesheet" href="style.css" type="text/css" media="screen" charset="utf-8">
     </head>
     <body>
-        <script src="build/index.js"></script>
+
         <h1>radius</h1>
         <p>talk to everyone within how many km?<p>
         <input type=range min=1 max=100 step=1 value=20>
@@ -15,5 +15,11 @@
         <div id="chat"></div>
         <input id="message_text"type="text"></input>
         <button id="send_button">send</button>
+
+        <script src="http://rsvpjs-builds.s3.amazonaws.com/rsvp-latest.js"></script>
+        <script src="https://cdn.firebase.com/js/client/1.0.21/firebase.js"></script>
+        <script src="https://cdn.firebase.com/libs/geofire/3.0.2/geofire.min.js"></script>
+        <script src="./index.js"></script>
+
     </body>
 </html>

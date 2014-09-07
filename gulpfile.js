@@ -34,7 +34,7 @@ gulp.task('browserify', function() {
         .transform(envify(environ))
         .transform(partialify)
         .bundle({
-            debug: process.env.NODE_ENV === 'development'
+            debug: true
         })
         .on('error', notify.onError('Error: <%= error.message %>'))
         .pipe(source('index.js'))

@@ -7,7 +7,11 @@
     "email": "thomas.hansen@gmail.com"
   },
   "dependencies": {
-    "lodash": "~2.4.1"
+    "client-firebase": "^1.0.1",
+    "firebase": "^1.0.21",
+    "geofire": "^3.0.2",
+    "lodash": "~2.4.1",
+    "uuid": "^1.4.1"
   },
   "devDependencies": {
     "browserify": "^3.46.0",
@@ -22,5 +26,5 @@
     "gulp-watch": "^0.6.4",
     "browser-sync": "^1.0.0"
   },
-  "saskavi": "c979fa01-742c-42dd-bf9b-06d649fce3ef"
+  "saskavi": "4d9c23f8-f2af-4793-ba3d-4e178d26e281"
 }
